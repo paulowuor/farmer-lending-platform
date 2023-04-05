@@ -199,6 +199,53 @@ color: #f05462;
     h2{
         text-align: center;
     }
+    table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  background-color: #0077be;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+button {
+  background-color: #0077be;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+.approve-btn {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.reject-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+
 </style>
     <body>
    
@@ -260,37 +307,57 @@ color: #f05462;
 
     // Display the orders in a table
     if ($result->num_rows > 0) {
-        echo "<table border='1'>";
-        echo "<tr><th>Order ID</th><th>User ID</th><th>Product ID</th><th>Total Cost(Ksh.)</th><th>Action</th></tr>";
-        // output data of each row
-        while($row = $result->fetch_assoc()) {
-            echo "<tr><td>".$row["order_id"]."</td><td>".$row["username"]."</td><td>".$row["id"]."</td><td>".$row["price"]."</td><td><button onclick='approveOrder(".$row["id"].")'>Approve</button><button onclick='rejectOrder(".$row["id"].")'>Reject</button></td></tr>";
-        }
-        echo "</table>";
-    } else {
-        echo "No pending orders.";
+    echo "<table border='1'>";
+    echo "<tr><th>Order ID</th><th>User ID</th><th>Product ID</th><th>Total Cost(Ksh.)</th><th>Action</th></tr>";
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        echo "<tr>
+                  <td>".$row["order_id"]."</td>
+                  <td>".$row["username"]."</td>
+                  <td>".$row["id"]."</td>
+                  <td>".$row["price"]."</td>
+                  <td>
+                      <button class='approve-btn' onclick='approveOrder(".$row["id"].")'>Approve</button>
+                      <button class='reject-btn' onclick='rejectOrder(".$row["id"].")'>Reject</button>
+                  </td>
+              </tr>";
     }
-
-    $con->close();
-    ?>
-<script>
-    function approveOrder(orderId) {
-    // Send an AJAX request to update the status of the order in the database
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "update_order.php", true);
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhr.onreadystatechange = function() {
-
-        if (this.readyState == 4 && this.status == 200) {
-            // Refresh the page to show the updated list of orders
-            location.reload();
-        }
-    };
-    xhr.send("id=" + orderId + "&status=rejected");
+    echo "</table>";
+} else {
+    echo "No pending orders.";
 }
 
- ?>
+$con->close();
+
+    ?>
+
+<script>
+    function rejectOrder(orderId) {
+    // Show a confirmation dialog to confirm the rejection of the order
+    var confirmReject = confirm("Are you sure you want to reject this order?");
+
+    if (confirmReject) {
+        // Send an AJAX request to reject the order
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                // Handle the response from the server
+                var response = JSON.parse(this.responseText);
+                if (response.success) {
+                    // Reload the page to update the list of orders
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            }
+        };
+        xhr.open("POST", "reject-order.php", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.send("order_id=" + orderId);
+    }
+}
 
 </script>
+
 </body>
 </html>

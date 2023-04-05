@@ -104,7 +104,7 @@ include("auth_session.php");
         </div>
     </div>
 
-    <button type="button" id="add-product-button">Add Product</button>
+    
 
     <input type="submit" name="submit" value="Add " class="login-button">
     <p class="link"><p>Do you want to go back</p><a href="admin.php">Click Here  To Return </a></p>
