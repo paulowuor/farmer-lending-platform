@@ -3,6 +3,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style type="text/css">
+        footer{
+    margin-top: 80%;
+background: gold;
+position: sticky;
+width: 100%;
+}
+    </style>
     <?php
 include("auth_session.php");
 
@@ -74,7 +82,7 @@ if(isset($_GET['search'])){
 else{
   // display all users if the search form is not submitted
   $sql = "SELECT * FROM farmers";
-  $query_run = mysqli_query($connection, $sql);
+  $query_run = mysqli_query($conn, $sql);
 }
 ?>
 
