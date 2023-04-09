@@ -9,6 +9,8 @@ include("auth_session.php");
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin</title>
+    <script src="min.js"></script>
+
 </head>
 <style type="text/css">
 
@@ -294,32 +296,32 @@ button:hover {
 <div class="cover"></div>
  <h1>Farmer Lending Platform</h1>
 <center><p style="margin-top:10px; text-align: center; margin-top: 5%;">Approve Orders</p><center>
-   
-    <?php
-    require('db.php');
-    if ($con->connect_error) {
-        die("Connection failed: " . $con->connect_error);
-    }
+   <button type="print" ><a href="pdf.php"> download</a></button>
+   <?php
+require('db.php');
 
-    // Retrieve all the pending orders
-    $sql = "SELECT * FROM `order` WHERE `status`='pending'";
-    $result = $con->query($sql) or die(mysqli_error($con));
+if ($con->connect_error) {
+    die("Connection failed: " . $con->connect_error);
+}
 
-    // Display the orders in a table
-    if ($result->num_rows > 0) {
-    echo "<table border='1'>";
+// Retrieve all the pending orders
+$sql = "SELECT * FROM `order`";
+$result = $con->query($sql) or die(mysqli_error($con));
+
+if ($result->num_rows > 0) {
+        echo "<table border='1'>";
     echo "<tr><th>Order ID</th><th>User ID</th><th>Product ID</th><th>Total Cost(Ksh.)</th><th>Action</th></tr>";
-    // output data of each row
     while($row = $result->fetch_assoc()) {
         echo "<tr>
-                  <td>".$row["order_id"]."</td>
-                  <td>".$row["username"]."</td>
-                  <td>".$row["id"]."</td>
-                  <td>".$row["price"]."</td>
-                  <td>
-                      <button class='approve-btn' onclick='approveOrder(".$row["id"].")'>Approve</button>
-                      <button class='reject-btn' onclick='rejectOrder(".$row["id"].")'>Reject</button>
-                  </td>
+              <td>" . $row["order_id"] . "</td>
+              <td>" . $row["username"] . "</td>
+              <td>" . $row["id"] . "</td>
+              <td>" . $row["price"] . "</td>
+
+              <td>
+                  <button class='approve-btn' id='approve-btn-" . $row["order_id"] . "' onclick='approveOrder(" . $row["order_id"] . ")'>Approve</button>
+                  <button class='reject-btn' onclick='rejectOrder(" . $row["order_id"] . ")'>Reject</button>
+              </td>
               </tr>";
     }
     echo "</table>";
@@ -328,36 +330,51 @@ button:hover {
 }
 
 $con->close();
+?>
 
-    ?>
+
 
 <script>
-    function rejectOrder(orderId) {
-    // Show a confirmation dialog to confirm the rejection of the order
-    var confirmReject = confirm("Are you sure you want to reject this order?");
-
-    if (confirmReject) {
-        // Send an AJAX request to reject the order
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                // Handle the response from the server
-                var response = JSON.parse(this.responseText);
-                if (response.success) {
-                    // Reload the page to update the list of orders
-                    location.reload();
-                } else {
-                    alert(response.message);
-                }
-            }
-        };
-        xhr.open("POST", "reject-order.php", true);
-        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhr.send("order_id=" + orderId);
+function approveOrder(order_id) {
+  // Send an AJAX request to the server to update the order status
+  $.ajax({
+    url: 'Approved.php',
+    type: 'POST',
+    data: {order_id: order_id, status: 'approved'},
+    success: function(response) {
+      // Display a success message to the user
+      alert('Do you want to approve this order!');
+      // Update the UI to reflect the new status of the order
+      $('#approve-btn-' + order_id).replaceWith('<span class="approved-text">Approved</span>');
+    },
+    error: function() {
+      // Display an error message to the user
+      alert('There was an error approving the order. Please try again later.');
     }
+  });
 }
 
-</script>
 
-</body>
-</html>
+</script>
+<script>
+
+function rejectOrder(order_id) {
+  // Send an AJAX request to the server to update the order status
+  $.ajax({
+    url: 'reject.php',
+    type: 'POST',
+    data: {order_id: order_id, status: 'rejected'},
+    success: function(response) {
+      // Display a success message to the user
+      alert('Do you want to reject this order!');
+      // Update the UI to reflect the new status of the order
+      $('#reject-btn-' + order_id).prop('disabled', true);
+      $('#reject-btn-' + order_id).text('rejected');
+    },
+    error: function() {
+      // Display an error message to the user
+      alert('There was an error approving the order. Please try again later.');
+    }
+  });
+}
+</script>

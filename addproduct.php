@@ -68,23 +68,45 @@ include("auth_session.php");
             $name = mysqli_real_escape_string($con, $_POST['name'][$i]);
             $code = mysqli_real_escape_string($con, $_POST['code'][$i]);
             $price = mysqli_real_escape_string($con, $_POST['price'][$i]);
-            $image = $_FILES['image']['name'][$i];
+            
+$image= $_FILES['image']['tmp_name'];
+$imgSize = $_FILES['image']['size'];
 
-            $query = "INSERT INTO `products` (name, code, price, image) VALUES ('$name', '$code', '$price', '$image')";
-            $result = mysqli_query($con, $query);
-        }
+$upload_dir = 'item_images/';
+$imgExt = strtolower(pathinfo($imgFile,PATHINFO_EXTENSION)); 
+$valid_extensions = array('jpeg', 'jpg', 'png', 'gif'); 
+$itempic = rand(1000,1000000).".".$imgExt;
 
-        if ($result) {
-            echo "<div class='form'>
-                  <h3>Products added successfully.</h3><br/>
-                  <p class='link'>Click here to <a href='addproduct.php'>add again</a> again.</p></div>";
-        } else {
-            echo "<div class='form'>
-                  <h3>Insert Correct Details.</h3><br/>
-                  <p class='link'>Click here to <a href='addproduct.php'>Add Inputs</a> again.</p>
-                  </div>";
-        }
-    }
+
+                
+    
+            if(in_array($imgExt, $valid_extensions)){           
+        
+                if($imgSize < 5000000)              {
+                    move_uploaded_file($tmp_dir,$upload_dir.$itempic);
+                    $saveitem="insert into products (name,price,,code,image) VALUE ('$name','$price','$code','$image')";
+                    mysqli_query($con,$saveitem);
+                     echo "<script>alert('Data successfully saved!')</script>";             
+                     echo "<script>window.open('addproduct.php','_self')</script>";
+                }
+                else{
+                    
+                     echo "<script>alert('Sorry, your file is too large.')</script>";               
+                     echo "<script>window.open('addproduct.php','_self')</script>";
+                }
+            }
+            else{
+                
+                 echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.')</script>";              
+                     echo "<script>window.open('addproduct.php','_self')</script>";
+                
+            }
+        
+    
+        
+
+}}
+   
 ?>
 
 <form class="form" action="" method="post" enctype="multipart/form-data">
@@ -92,14 +114,14 @@ include("auth_session.php");
 
     <div id="products-container">
         <div class="product">
-            <input type="text" class="login-input" name="name[]" placeholder="name" required />
+            <input type="text" class="login-input" name="name" placeholder="name" required />
             <br>
-            <input type="text" class="login-input" name="code[]" placeholder="code">
+            <input type="text" class="login-input" name="code" placeholder="code">
             <br>
-            <input type="text" class="login-input" name="price[]" placeholder="price">
+            <input type="text" class="login-input" name="price" placeholder="price">
             <br>
             <label for="myfile">Select an image:</label>
-            <input type="file" class="login-input" name="image[]">
+            <input type="file" class="login-input" name="image">
             <br>
         </div>
     </div>

@@ -5,11 +5,12 @@
 <head>
     <style type="text/css">
         footer{
-    margin-top: 80%;
+    margin-top: 100%;
 background: gold;
 position: sticky;
 width: 100%;
 }
+
     </style>
     <?php
 include("auth_session.php");
