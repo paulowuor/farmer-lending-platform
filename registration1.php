@@ -58,53 +58,62 @@ include("auth_session.php");
  <h1>Farmer Lending Platform</h1>
 <center><p style="margin-top:10px; text-align: center; margin-top: 5%;">Welcome Admin</p><center>
    <?php
+   require('db1.php');
 
-    require('db1.php');
+if (isset($_POST['username'])) {
 
-    // When form submitted, insert values into the database.
-    if (isset($_POST['username'])) {
-        
+    // removes backslashes
+    $username = stripslashes($_REQUEST['username']);
+    //escapes special characters in a string
+    $username = mysqli_real_escape_string($con, $username);
+    $email    = stripslashes($_REQUEST['email']);
+    $email    = mysqli_real_escape_string($con, $email);
+    $phonenumber   = stripslashes($_REQUEST['phonenumber']);
+    $phonenumber    = mysqli_real_escape_string($con, $phonenumber);
+    $nationalID   = stripslashes($_REQUEST['nationalID']);
+    $nationalID    = mysqli_real_escape_string($con, $nationalID);
+    $companyID  = stripslashes($_REQUEST['companyID']);
+    $companyID   = mysqli_real_escape_string($con, $companyID);
+    $password = stripslashes($_REQUEST['password']);
+    $password = mysqli_real_escape_string($con, $password);
 
-        // removes backslashes
-        $username = stripslashes($_REQUEST['username']);
-        //escapes special characters in a string
-        $username = mysqli_real_escape_string($con, $username);
-        $email    = stripslashes($_REQUEST['email']);
-        $email    = mysqli_real_escape_string($con, $email);
-        $phonenumber   = stripslashes($_REQUEST['phonenumber']);
-        $phonenumber    = mysqli_real_escape_string($con, $phonenumber);
-         $nationalID   = stripslashes($_REQUEST['nationalID']);
-        $nationalID    = mysqli_real_escape_string($con, $nationalID);
-        $companyID  = stripslashes($_REQUEST['companyID']);
-        $companyID   = mysqli_real_escape_string($con, $companyID);
-        $password = stripslashes($_REQUEST['password']);
-        $password = mysqli_real_escape_string($con, $password);
-         
+    // Check if user already exists in the database
+    $query = "SELECT * FROM farmers WHERE nationalID='$nationalID'";
+    $result = mysqli_query($con, $query);
+    if (mysqli_num_rows($result) > 0) {
+        echo "<div class='form'>
+              <h3>User already registered.</h3><br/>
+              <p class='link'>Click here to <a href='registration1.php'>try again</a></p>
+              </div>";
+    } else {
+        // Insert user into the database
         $query= "INSERT into `farmers` (username, password, email,phonenumber,nationalID,companyID)
-                     VALUES ('$username', '" . md5($password) . "', '$email','$phonenumber','$nationalID','$companyID')";
+                 VALUES ('$username', '" . md5($password) . "', '$email','$phonenumber','$nationalID','$companyID')";
         $result = mysqli_query($con, $query);
         if ($result) {
             echo "<div class='form'>
                   <h3>Farmer registered successfully.</h3><br/>
                   <p class='link'>Click here to <a href='farmerreport.php'>generate report</a></p>
                   <br>
-                  <p class='link'>Click here to <a href='registration1.php'>again</a></p>
+                  <p class='link'>Click here to <a href='registration1.php'>register again</a></p>
                   </div>";
         } else {
             echo "<div class='form'>
                   <h3>Required fields are missing.</h3><br/>
-                  <p class='link'>Click here to <a href='registration1.php'>registration</a> again.</p>
+                  <p class='link'>Click here to <a href='registration1.php'>register again</a></p>
                   </div>";
         }
-        } else {
-?>
+    }
+} else {
+    // Display registration form
+    ?>
     <form class="form" action="" method="post">
         <h1 class="login-title">Register Farmer Here</h1>
         <input type="text" class="login-input" name="username" placeholder="Enter Username" required />
         <br>
         <input type="email"  class="login-input" name="email" placeholder="Enter Email Adress" required>
         
-        <br>
+<br>
         <input type="tel" id="phone" class="login-input" name="phonenumber" placeholder="Phone No(must be numericals and max-10)"pattern="[0-9]{1}[0-9]{9}" 
        title="Invalid phone number" required>
         
@@ -124,7 +133,6 @@ include("auth_session.php");
      <input type="reset" name="reset"  value="reset" class="resetbutton">
         
     </form>
-
 <script>
   // Get the input field
   const emailInput = document.getElementById("email");
