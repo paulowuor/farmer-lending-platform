@@ -1,16 +1,19 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-<?php
+     <?php
 include("auth_session.php");
 
 ?>
-<!DOCTYPE html>
-<html>
-<head>
+ 
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin</title>
+    <script src="min.js"></script>
 
-    <style type="text/css">
+</head>
+<style type="text/css">
+
 
 footer{
     margin-top: 80%;
@@ -191,27 +194,62 @@ color: #f05462;
     cursor: pointer;
 }
 
- 
-    
-    </style>
-    <title>Dashboard - Client area</title>
-    <link rel="stylesheet" href="style.cs" />
-</head>
-<body>
-<div class="form">
-      
-        </div>
+    h1{
+        text-align: center;
+        background: seagreen;
+    }
+    h2{
+        text-align: center;
+    }
+    table {
+  border-collapse: collapse;
+  width: 100%;
+}
 
- 
-<!DOCTYPE html>
-<html>
-<head>
+th, td {
+  text-align: left;
+  padding: 8px;
+}
 
-    </style>
-    <meta charset="utf-8">
-    <title>Welcome Admin</title>
-</head>
-<body>
+th {
+  background-color: #0077be;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+button {
+  background-color: #0077be;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+.approve-btn {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.reject-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+
+</style>
+    <body>
    
     <div class="form2">
         
@@ -225,8 +263,6 @@ color: #f05462;
              <li><a href="registration1.php" style="text-decoration: none;"><img src="avatar.PNG" style="width: 30px; height: 30px; margin: 2px;"><span>Add Farmer</a></span></li>
              </li>
              <li><a href="admin_approve.php" style="text-decoration: none;"><img src="avatar.PNG" style="width: 30px; height: 30px; margin: 2px;"><span>Approve Carts</a></span></li>
-             </li>
-             <li><a href="approved_farmers.php" style="text-decoration: none;"><img src="avatar.PNG" style="width: 30px; height: 30px; margin: 2px;"><span>Approved Orders</a></span></li>
              </li>
             <li><a href="addproduct.php" style="text-decoration: none;"><img src="avatar.PNG" style="width: 30px; height: 30px; margin: 2px"><span>Add Product</a></span></li>
               <li><a href="admin.php" style="text-decoration: none;"><img src="avatar.PNG" style="width: 30px; height: 30px; margin: 2px"><span>Home</a></span></li>
@@ -259,13 +295,90 @@ color: #f05462;
 </div>
 <div class="cover"></div>
  <h1>Farmer Lending Platform</h1>
-<center><p style="margin-top:10px; text-align: center; margin-top: 5%;">Welcome Admin</p><center>
-   
-</body>
- <footer>
-    &copy;<em id="date"></em>Paul Owuor De Developer
-</footer>
-</html>
+<center><p style="margin-top:10px; text-align: center; margin-top: 5%;">Approve Orders</p><center>
+   <button type="print" ><a href="print/print_pdf.php"> download</a></button>
+  <?php
+require('db.php');
 
- 
- 
+if ($con->connect_error) {
+    die("Connection failed: " . $con->connect_error);
+}
+
+// Retrieve all the pending orders
+$sql = "SELECT * FROM `order`";
+$result = $con->query($sql) or die(mysqli_error($con));
+
+if ($result->num_rows > 0) {
+    echo "<table border='1'>";
+    echo "<tr><th>Order ID</th><th>User ID</th><th>Product ID</th><th>Total Cost(Ksh.)</th><th>Status</th></tr>";
+    while($row = $result->fetch_assoc()) {
+        echo "<tr>
+              <td>" . $row["order_id"] . "</td>
+              <td>" . $row["username"] . "</td>
+              <td>" . $row["id"] . "</td>
+              <td>" . $row["price"] . "</td>
+              <td>";
+                  if($row['status']==0){
+                    echo'<a href="Approved.php?order_id='.$row["order_id"].'">Approve</a>|<a href="reject.php?order_id='.$row["order_id"].'">Decline</a>';
+                  }
+                  else{
+                    echo 'approved';
+                  }
+              echo '</td>';
+              echo '</tr>';
+    }
+    echo "</table>";
+} else {
+    echo "No pending orders.";
+}
+
+$con->close();
+?>
+
+
+
+
+<script>
+function approveOrder(order_id) {
+  // Send an AJAX request to the server to update the order status
+  $.ajax({
+    url: 'Approved.php',
+    type: 'POST',
+    data: {order_id: order_id, status: 'approved'},
+    success: function(response) {
+      // Display a success message to the user
+      alert('Do you want to approve this order!');
+      // Update the UI to reflect the new status of the order
+      $('#approve-btn-' + order_id).replaceWith('<span class="approved-text">Approved</span>');
+    },
+    error: function() {
+      // Display an error message to the user
+      alert('There was an error approving the order. Please try again later.');
+    }
+  });
+}
+
+
+</script>
+<script>
+
+function rejectOrder(order_id) {
+  // Send an AJAX request to the server to update the order status
+  $.ajax({
+    url: 'reject.php',
+    type: 'POST',
+    data: {order_id: order_id, status: 'rejected'},
+    success: function(response) {
+      // Display a success message to the user
+      alert('Do you want to reject this order!');
+      // Update the UI to reflect the new status of the order
+      $('#reject-btn-' + order_id).prop('disabled', true);
+      $('#reject-btn-' + order_id).text('rejected');
+    },
+    error: function() {
+      // Display an error message to the user
+      alert('There was an error approving the order. Please try again later.');
+    }
+  });
+}
+</script>

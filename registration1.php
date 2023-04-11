@@ -11,6 +11,36 @@ include("auth_session.php");
 <link rel="stylesheet" type="text/css" href="login.css">
     <meta charset="utf-8">
     <title>Welcome Admin</title>
+    <style>
+        .login-button {
+  background-color: #4CAF50; /* Green background */
+  border: none; /* Remove borders */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding */
+  text-align: center; /* Center text */
+  text-decoration: none; /* Remove underline */
+  display: inline-block; /* Display as inline block */
+  font-size: 16px; /* Font size */
+  margin: 10px 2px; /* Add some margin */
+  cursor: pointer; /* Change cursor to pointer */
+  border-radius: 5px; /* Add rounded corners */
+}
+
+.resetbutton {
+  background-color: #f44336; /* Red background */
+  border: none; /* Remove borders */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding */
+  text-align: center; /* Center text */
+  text-decoration: none; /* Remove underline */
+  display: inline-block; /* Display as inline block */
+  font-size: 16px; /* Font size */
+  margin: 10px 2px; /* Add some margin */
+  cursor: pointer; /* Change cursor to pointer */
+  border-radius: 5px; /* Add rounded corners */
+}
+
+    </style>
 </head>
 <body>
    

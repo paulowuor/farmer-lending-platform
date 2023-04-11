@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   } else {
     echo "Error updating order: " . $con->error;
   }
+  header("Location: approvedStudents.php");
 
   // Close the database connection
   $con->close();
